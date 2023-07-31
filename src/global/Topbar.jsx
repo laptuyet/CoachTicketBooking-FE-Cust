@@ -17,25 +17,43 @@ import UserDrawerItems from "./UserDrawerItems";
 import { Link } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/SearchOutlined";
 import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumberOutlined";
+import useLogin from "../utils/useLogin";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import * as userApi from "../queries/user/userQueries";
 
-const renderUserSettings = () => {
+const renderUserSettings = (isLoggedIn) => {
   return (
     <Box width="300px">
       <List>
-        {UserDrawerItems.map((item, index) => (
-          <Link
-            key={index}
-            to={item.to}
-            style={{ textDecoration: "none", color: "#000" }}
-          >
-            <ListItem disablePadding>
-              <ListItemButton disableRipple>
-                <ListItemIcon>{<item.icon />}</ListItemIcon>
-                <ListItemText primary={item.label} />
-              </ListItemButton>
-            </ListItem>
-          </Link>
-        ))}
+        {UserDrawerItems.map((item, index) =>
+          isLoggedIn === item?.requireLogin ? (
+            <Link
+              key={index}
+              to={item.to}
+              style={{ textDecoration: "none", color: "#000" }}
+            >
+              <ListItem disablePadding>
+                <ListItemButton disableRipple>
+                  <ListItemIcon>{<item.icon />}</ListItemIcon>
+                  <ListItemText primary={item.label} />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          ) : !isLoggedIn === !item?.requireLogin ? (
+            <Link
+              key={index}
+              to={item.to}
+              style={{ textDecoration: "none", color: "#000" }}
+            >
+              <ListItem disablePadding>
+                <ListItemButton disableRipple>
+                  <ListItemIcon>{<item.icon />}</ListItemIcon>
+                  <ListItemText primary={item.label} />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          ) : undefined
+        )}
       </List>
     </Box>
   );
@@ -43,6 +61,9 @@ const renderUserSettings = () => {
 
 const Topbar = () => {
   const [toggleDrawer, setToggleDrawer] = useState(false);
+  const isLoggedIn = useLogin();
+  const loggedInUsername = localStorage.getItem("loggedInUsername");
+
   return (
     <Box
       position="fixed"
@@ -61,7 +82,11 @@ const Topbar = () => {
           cursor: "pointer",
         }}
       >
-        <Typography>FaekBus Icon</Typography>
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <Typography variant="h5" fontWeight="bold">
+            FaekBus Icon
+          </Typography>
+        </Link>
       </Box>
       {/* Top bar Menu */}
 
@@ -97,27 +122,34 @@ const Topbar = () => {
       {/* User Settings */}
       <Box display="flex">
         {/* side bar user settings */}
-        <IconButton onClick={() => setToggleDrawer(!toggleDrawer)}>
-          <ManageAccountsOutlinedIcon />
+        <Button onClick={() => setToggleDrawer(!toggleDrawer)}>
+          <Box display="flex" alignItems="center" gap="5px">
+            <ManageAccountsOutlinedIcon />
+          </Box>
           <Drawer
             anchor="right"
             open={toggleDrawer}
             onClose={() => setToggleDrawer(!toggleDrawer)}
           >
-            <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              flexDirection="column"
-              height="150px"
-            >
-              <Typography fontWeight="bold">Xin chào</Typography>
-              <Typography fontStyle="italic">username</Typography>
-            </Box>
-            <Divider />
-            {renderUserSettings()}
+            {isLoggedIn && loggedInUsername !== null && (
+              <>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  flexDirection="column"
+                  height="150px"
+                >
+                  <Typography fontWeight="bold">Xin chào</Typography>
+                  <Typography fontStyle="italic">{loggedInUsername}</Typography>
+                </Box>
+                <Divider />
+              </>
+            )}
+
+            {renderUserSettings(isLoggedIn)}
           </Drawer>
-        </IconButton>
+        </Button>
       </Box>
     </Box>
   );
