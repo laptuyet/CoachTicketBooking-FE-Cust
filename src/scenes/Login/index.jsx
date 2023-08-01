@@ -12,13 +12,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Formik } from "formik";
 import React, { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import * as authApi from "../../queries/auth/authQueries";
-import * as userApi from "../../queries/user/userQueries";
 import { tokens } from "../../theme";
 import { debounce } from "../../utils/debounce";
 import { handleToast } from "../../utils/helpers";
@@ -48,17 +47,11 @@ const Login = () => {
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const queryClient = useQueryClient();
   const isLoggedIn = useLogin();
 
   const loginMutation = useMutation({
     mutationFn: (authReq) => authApi.login(authReq),
   });
-
-  // const getUserInfo = async (username) => {
-  //   const data = await userApi.getUser(username);
-  //   queryClient.setQueryData(["loggedInUser"], data);
-  // };
 
   const handleFormSubmit = (values, actions) => {
     loginMutation.mutate(values, {

@@ -15,8 +15,11 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { format, parse } from "date-fns";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { tokens } from "../../../../theme";
+import useLogin from "../../../../utils/useLogin";
+import { useQuery } from "@tanstack/react-query";
+import * as userApi from "../../../../queries/user/userQueries";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -43,10 +46,30 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     bookingData.paymentMethod === "CARD" ? true : false
   );
 
+  const isLoggedIn = useLogin();
+  const loggedInUsername = localStorage.getItem("loggedInUsername");
+
+  const userInfoQuery = useQuery({
+    queryKey: ["users", loggedInUsername],
+    queryFn: () => userApi.getUser(loggedInUsername),
+    enabled: isLoggedIn && loggedInUsername !== null,
+  });
+
   const bookingDate = format(
     parse(bookingDateTime, "yyyy-MM-dd HH:mm", new Date()),
     "dd/MM/yyyy"
   );
+
+  useEffect(() => {
+    if (userInfoQuery?.data) {
+      const { firstName, lastName, email, phone, address } = userInfoQuery.data;
+      setFieldValue("firstName", firstName);
+      setFieldValue("lastName", lastName);
+      setFieldValue("email", email);
+      setFieldValue("phone", phone);
+      setFieldValue("pickUpAddress", address);
+    }
+  }, [userInfoQuery.data, loggedInUsername]);
 
   return (
     <>
@@ -59,10 +82,6 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         bgcolor={colors.primary[100]}
         p="30px"
         borderRadius="10px"
-        // alignItems="start"
-        // gap="20px"
-        // maxHeight="500px"
-        // overflow="auto"
       >
         {/* booking summary */}
         <Box

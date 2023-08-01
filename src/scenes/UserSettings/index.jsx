@@ -13,10 +13,10 @@ import {
 } from "@mui/material";
 import { tokens } from "../../theme";
 import * as userApi from "../../queries/user/userQueries";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useLogin from "../../utils/useLogin";
 import { parse, format } from "date-fns";
-import { debounce } from "../../../../ticket-booking-admin/src/utils/debounce";
+import { debounce } from "../../utils/debounce";
 import * as yup from "yup";
 import { messages } from "../../utils/validationMessages";
 import { APP_CONSTANTS } from "../../utils/appContants";
@@ -27,6 +27,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import SaveAsOutlinedIcon from "@mui/icons-material/SaveAsOutlined";
 import { LoadingButton } from "@mui/lab";
+import { handleToast } from "../../utils/helpers";
 
 const initialValues = {
   username: "",
@@ -103,6 +104,7 @@ const UserSettings = () => {
   const colors = tokens();
   const isLoggedIn = useLogin();
   const loggedInUsername = localStorage.getItem("loggedInUsername");
+  const queryClient = useQueryClient();
 
   const userInfoQuery = useQuery({
     queryKey: ["users", loggedInUsername],
@@ -115,7 +117,17 @@ const UserSettings = () => {
   });
 
   const handleFormSubmit = (values, actions) => {
-    console.log(values);
+    let { isEditMode, ...newValues } = values;
+    updateMutation.mutate(newValues, {
+      onSuccess: (data) => {
+        queryClient.setQueryData(["users", loggedInUsername], data);
+        handleToast("success", "Cập nhật thông tin thành công");
+      },
+      onError: (error) => {
+        console.log(error);
+        handleToast("error", error.response?.data?.message);
+      },
+    });
   };
 
   return (
@@ -156,7 +168,7 @@ const UserSettings = () => {
                 display="grid"
                 gridTemplateColumns="repeat(4, 1fr)"
                 gap="30px"
-                p="20px"
+                p="30px 40px"
                 bgcolor={colors.primary[100]}
                 borderRadius="8px"
               >
@@ -336,20 +348,25 @@ const UserSettings = () => {
                     />
                   </RadioGroup>
                 </FormControl>
-              </Box>
-              <Box mt="20px" display="flex" justifyContent="center">
-                <LoadingButton
-                  disableRipple
-                  disableElevation
-                  color="secondary"
-                  type="submit"
-                  variant="contained"
-                  loadingPosition="start"
-                  loading={updateMutation.isLoading}
-                  startIcon={<SaveAsOutlinedIcon />}
+                <Box
+                  //   mt="20px"
+                  display="flex"
+                  justifyContent="center"
+                  gridColumn="span 4"
                 >
-                  "Lưu"
-                </LoadingButton>
+                  <LoadingButton
+                    disableRipple
+                    disableElevation
+                    color="secondary"
+                    type="submit"
+                    variant="contained"
+                    loadingPosition="start"
+                    loading={updateMutation.isLoading}
+                    startIcon={<SaveAsOutlinedIcon />}
+                  >
+                    "Lưu"
+                  </LoadingButton>
+                </Box>
               </Box>
             </form>
           )}

@@ -161,7 +161,7 @@ const BookingSearch = () => {
         />
       </Box>
       {bookingSearchQuery?.data && !isInValidPhone ? (
-        bookingSearchQuery.data.length !== 0 && !isInValidPhone ? (
+        filteredTickets.length !== 0 && !isInValidPhone ? (
           <Box
             display="grid"
             gridTemplateColumns="repeat(12, 1fr)"
