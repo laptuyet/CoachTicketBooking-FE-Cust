@@ -1,6 +1,8 @@
+import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumberOutlined";
+import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
+import SearchIcon from "@mui/icons-material/SearchOutlined";
 import {
   Box,
-  Button,
   Divider,
   Drawer,
   IconButton,
@@ -12,19 +14,14 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
-import UserDrawerItems from "./UserDrawerItems";
 import { Link } from "react-router-dom";
-import SearchIcon from "@mui/icons-material/SearchOutlined";
-import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 import useLogin from "../utils/useLogin";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import * as userApi from "../queries/user/userQueries";
+import UserDrawerItems from "./UserDrawerItems";
 
 const renderUserSettings = (isLoggedIn) => {
   return (
     <Box width="300px">
-      <List>
+      <List sx={{ mt: "20px" }}>
         {UserDrawerItems.map((item, index) =>
           isLoggedIn === item?.requireLogin ? (
             <Link
@@ -66,6 +63,7 @@ const Topbar = () => {
 
   return (
     <Box
+      zIndex={1000}
       position="fixed"
       top={0}
       left={0}
@@ -82,38 +80,55 @@ const Topbar = () => {
           cursor: "pointer",
         }}
       >
-        <Link to="/" style={{ textDecoration: "none" }}>
-          <Typography variant="h5" fontWeight="bold">
-            FaekBus Icon
-          </Typography>
+        {/* ICON */}
+        <Link to="/" style={{ textDecoration: "none", color: "#000" }}>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            gap="4px"
+          >
+            <Typography fontWeight="bold" variant="h5">
+              DIDU
+            </Typography>
+            <Box width="30px" height="30px">
+              <img
+                src="src/assets/BusImages/bus.png"
+                alt="bus_icon"
+                width="100%"
+                height="100%"
+                style={{
+                  objectFit: "contain",
+                }}
+              />
+            </Box>
+            <Typography fontWeight="bold" variant="h5">
+              DUADI
+            </Typography>
+          </Box>
         </Link>
       </Box>
-      {/* Top bar Menu */}
 
+      {/* Top bar Menu */}
       <Box display="flex" gap="30px">
         <Link to="/booking">
-          <IconButton
-            disableRipple
-            sx={{
-              border: "2px solid #dadada",
-              borderRadius: "10px",
-            }}
-          >
+          <IconButton disableRipple color="success">
             <Box display="flex" gap="10px">
               <ConfirmationNumberIcon />
-              <Typography fontWeight="bold">Đặt vé</Typography>
+              <Typography fontWeight="bold" variant="h5">
+                Đặt vé
+              </Typography>
             </Box>
           </IconButton>
         </Link>
 
         <Link to="/booking-search">
-          <IconButton
-            disableRipple
-            sx={{ border: "2px solid #dadada", borderRadius: "10px" }}
-          >
+          <IconButton disableRipple color="success">
             <Box display="flex" gap="10px">
               <SearchIcon />
-              <Typography fontWeight="bold">Tra cứu vé</Typography>
+              <Typography fontWeight="bold" variant="h5">
+                Tra cứu vé
+              </Typography>
             </Box>
           </IconButton>
         </Link>
@@ -122,7 +137,7 @@ const Topbar = () => {
       {/* User Settings */}
       <Box display="flex">
         {/* side bar user settings */}
-        <Button onClick={() => setToggleDrawer(!toggleDrawer)}>
+        <IconButton onClick={() => setToggleDrawer(!toggleDrawer)}>
           <Box display="flex" alignItems="center" gap="5px">
             <ManageAccountsOutlinedIcon />
           </Box>
@@ -140,8 +155,12 @@ const Topbar = () => {
                   flexDirection="column"
                   height="150px"
                 >
-                  <Typography fontWeight="bold">Xin chào</Typography>
-                  <Typography fontStyle="italic">{loggedInUsername}</Typography>
+                  <Typography fontWeight="bold" variant="h3">
+                    Xin chào
+                  </Typography>
+                  <Typography fontStyle="italic" variant="h4">
+                    {loggedInUsername}
+                  </Typography>
                 </Box>
                 <Divider />
               </>
@@ -149,7 +168,7 @@ const Topbar = () => {
 
             {renderUserSettings(isLoggedIn)}
           </Drawer>
-        </Button>
+        </IconButton>
       </Box>
     </Box>
   );

@@ -310,7 +310,7 @@ const Register = () => {
                   disableElevation
                   disableRipple
                   variant="contained"
-                  color="success"
+                  color="secondary"
                   type="submit"
                 >
                   Đăng ký
@@ -322,16 +322,32 @@ const Register = () => {
                 display="flex"
                 gridColumn="span 4"
                 justifyContent="center"
+                textAlign="center"
+                flexDirection="column"
+                gap="10px"
               >
-                <Typography component="span" variant="h5">
-                  Đã có tài khoản ?
-                  <Link to="/login">
-                    <Typography component="span" variant="h5">
-                      {" "}
-                      Đăng nhập
-                    </Typography>
-                  </Link>
-                </Typography>
+                <Box>
+                  <Typography component="span" variant="h5">
+                    Đã có tài khoản ?
+                    <Link to="/login" style={{ textDecoration: "none" }}>
+                      <Typography component="span" variant="h5">
+                        {" "}
+                        Đăng nhập
+                      </Typography>
+                    </Link>
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography component="span" variant="h5">
+                    Quên mật khẩu ?
+                    <Link to="/forgot" style={{ textDecoration: "none" }}>
+                      <Typography component="span" variant="h5">
+                        {" "}
+                        Khôi phục
+                      </Typography>
+                    </Link>
+                  </Typography>
+                </Box>
               </Box>
             </Box>
           </form>

@@ -1,6 +1,8 @@
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
+import PasswordIcon from '@mui/icons-material/Password';
+import LockResetIcon from '@mui/icons-material/LockReset';
 
 const UserDrawerItems = [
     {
@@ -18,6 +20,13 @@ const UserDrawerItems = [
         requireLogin: true
     },
     {
+        label: "Đổi mật khẩu",
+        code: "change_password",
+        to: "/change-password",
+        icon: PasswordIcon,
+        requireLogin: true
+    },
+    {
         label: "Đăng xuất",
         code: "logout",
         to: "/logout",
@@ -29,6 +38,13 @@ const UserDrawerItems = [
         code: "register",
         to: "/register",
         icon: LogoutOutlinedIcon,
+        requireLogin: false
+    },
+    {
+        label: "Quên mật khẩu",
+        code: "forgot",
+        to: "/forgot",
+        icon: LockResetIcon,
         requireLogin: false
     },
 

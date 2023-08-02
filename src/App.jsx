@@ -20,6 +20,8 @@ import Logout from "./scenes/Logout";
 import Register from "./scenes/Register";
 import useLogin from "./utils/useLogin";
 import UserSettings from "./scenes/UserSettings";
+import ForgotPwd from "./scenes/ForgotPwd";
+import ChangePassword from "./scenes/ChangePassword";
 
 const ProtectedRoutes = () => {
   const isLoggedIn = useLogin();
@@ -55,9 +57,14 @@ const App = () => {
                   <Route index element={<LandingPage />} />
                   <Route path="login" element={<Login />} />
                   <Route path="logout" element={<Logout />} />
+                  <Route path="forgot" element={<ForgotPwd />} />
                   <Route path="register" element={<Register />} />
                   <Route element={<ProtectedRoutes />}>
                     <Route path="settings" element={<UserSettings />} />
+                    <Route
+                      path="change-password"
+                      element={<ChangePassword />}
+                    />
                   </Route>
                   <Route path="booking" element={<BookingOrder />} />
                   <Route path="booking-search" element={<BookingSearch />} />
