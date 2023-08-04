@@ -22,6 +22,7 @@ import useLogin from "./utils/useLogin";
 import UserSettings from "./scenes/UserSettings";
 import ForgotPwd from "./scenes/ForgotPwd";
 import ChangePassword from "./scenes/ChangePassword";
+import MyTicket from "./scenes/MyTicket";
 
 const ProtectedRoutes = () => {
   const isLoggedIn = useLogin();
@@ -61,6 +62,7 @@ const App = () => {
                   <Route path="register" element={<Register />} />
                   <Route element={<ProtectedRoutes />}>
                     <Route path="settings" element={<UserSettings />} />
+                    <Route path="my-ticket" element={<MyTicket />} />
                     <Route
                       path="change-password"
                       element={<ChangePassword />}

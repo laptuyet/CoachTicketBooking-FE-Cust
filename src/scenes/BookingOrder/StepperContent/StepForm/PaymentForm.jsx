@@ -63,6 +63,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   useEffect(() => {
     if (userInfoQuery?.data) {
       const { firstName, lastName, email, phone, address } = userInfoQuery.data;
+      setFieldValue("user", userInfoQuery.data);
       setFieldValue("firstName", firstName);
       setFieldValue("lastName", lastName);
       setFieldValue("email", email);

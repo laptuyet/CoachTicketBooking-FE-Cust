@@ -26,7 +26,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const initialValues = {
-  username: localStorage.getItem("loggedInUsername"),
+  username: "",
   newPassword: "",
   reNewPassword: "",
 };
@@ -45,6 +45,7 @@ const ChangePassword = () => {
   const colors = tokens();
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
+  const loggedInUsername = localStorage.getItem("loggedInUsername");
   const changePwdMutation = useMutation({
     mutationFn: (changePwdRequest) => authApi.changePwd(changePwdRequest),
   });
@@ -74,7 +75,7 @@ const ChangePassword = () => {
     >
       <Formik
         onSubmit={handleChangePasswordSubmit}
-        initialValues={initialValues}
+        initialValues={{ ...initialValues, username: loggedInUsername }}
         validationSchema={changePwdSchema}
         enableReinitialize={true}
       >

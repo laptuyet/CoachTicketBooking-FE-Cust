@@ -105,7 +105,6 @@ const StepperBooking = () => {
   // main process submit form
   const submitForm = (values, actions) => {
     const {
-      user,
       source,
       destination,
       nameOnCard,

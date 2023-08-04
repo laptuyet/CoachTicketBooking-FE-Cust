@@ -10,6 +10,11 @@ const getAllByPhone = async (phone) => {
     return resp.data
 }
 
+const getAllByUsername = async (username) => {
+    const resp = await http.get(`/bookings/all/user/${username}`)
+    return resp.data
+}
+
 const getPageOfBookings = async (page, limit) => {
     const resp = await http.get("/bookings/paging", {
         params: {
@@ -56,7 +61,7 @@ const deleteBooking = async (bookingId) => {
 }
 
 export {
-    createNewBookings, deleteBooking, getAll, getAllByPhone,
+    createNewBookings, deleteBooking, getAll, getAllByPhone, getAllByUsername,
     getPageOfBookings, getSeatBooking, getBooking, updateBooking
 };
 

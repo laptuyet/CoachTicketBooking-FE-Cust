@@ -1,8 +1,10 @@
 import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
+import LocalActivityOutlinedIcon from "@mui/icons-material/LocalActivityOutlined";
 import SearchIcon from "@mui/icons-material/SearchOutlined";
 import {
   Box,
+  Button,
   Divider,
   Drawer,
   IconButton,
@@ -14,7 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useLogin from "../utils/useLogin";
 import UserDrawerItems from "./UserDrawerItems";
 
@@ -60,7 +62,7 @@ const Topbar = () => {
   const [toggleDrawer, setToggleDrawer] = useState(false);
   const isLoggedIn = useLogin();
   const loggedInUsername = localStorage.getItem("loggedInUsername");
-
+  const navigate = useNavigate();
   return (
     <Box
       zIndex={1000}
@@ -110,32 +112,50 @@ const Topbar = () => {
       </Box>
 
       {/* Top bar Menu */}
-      <Box display="flex" gap="30px">
+      <Box display="flex" gap="30px" alignItems="center">
         <Link to="/booking">
-          <IconButton disableRipple color="success">
+          <Button
+            variant="outlined"
+            disableRipple
+            disableElevation
+            color="info"
+          >
             <Box display="flex" gap="10px">
               <ConfirmationNumberIcon />
-              <Typography fontWeight="bold" variant="h5">
-                Đặt vé
-              </Typography>
+              <Typography variant="h5">Đặt vé</Typography>
             </Box>
-          </IconButton>
+          </Button>
         </Link>
 
         <Link to="/booking-search">
-          <IconButton disableRipple color="success">
+          <Button
+            variant="outlined"
+            disableRipple
+            disableElevation
+            color="info"
+          >
             <Box display="flex" gap="10px">
               <SearchIcon />
-              <Typography fontWeight="bold" variant="h5">
-                Tra cứu vé
-              </Typography>
+              <Typography variant="h5">Tra cứu vé</Typography>
             </Box>
-          </IconButton>
+          </Button>
         </Link>
       </Box>
 
       {/* User Settings */}
-      <Box display="flex">
+      <Box display="flex" gap="10px" alignItems="center">
+        <Button
+          disableElevation
+          disableRipple
+          variant="contained"
+          color="warning"
+          onClick={() => {
+            navigate("/my-ticket");
+          }}
+          startIcon={<LocalActivityOutlinedIcon />}
+        >
+          Vé của tôi
+        </Button>
         {/* side bar user settings */}
         <IconButton onClick={() => setToggleDrawer(!toggleDrawer)}>
           <Box display="flex" alignItems="center" gap="5px">

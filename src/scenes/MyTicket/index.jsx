@@ -47,19 +47,19 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-const BookingSearch = () => {
+const MyTicket = () => {
   const colors = tokens();
   const [openModal, setOpenModal] = useState(false);
-  const [searchPhone, setSearchPhone] = useState("");
   const [isInValidPhone, setIsInValidPhone] = useState(false);
-  const [filteredTickets, setFilteredTickets] = useState([]);
+  const [sortedTickets, setSortedTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(-1);
+  const loggedInUsername = localStorage.getItem("loggedInUsername");
   const queryClient = useQueryClient();
 
   const bookingSearchQuery = useQuery({
-    queryKey: ["bookings", "all", searchPhone],
-    queryFn: () => bookingApi.getAllByPhone(searchPhone),
-    enabled: !isInValidPhone && searchPhone !== "",
+    queryKey: ["bookings", "all", "user", loggedInUsername],
+    queryFn: () => bookingApi.getAllByUsername(loggedInUsername),
+    enabled: loggedInUsername !== "",
   });
 
   const bookingDetailQuery = useQuery({
@@ -68,40 +68,13 @@ const BookingSearch = () => {
     enabled: selectedTicket >= 0,
   });
 
-  const checkValidPhone = (phone) => {
-    if (phone !== "") {
-      if (!APP_CONSTANTS.PHONE_REGEX.test(phone)) {
-        queryClient.removeQueries({ queryKey: ["bookings", "all", phone] });
-        setIsInValidPhone(true);
-      } else setIsInValidPhone(false);
-    } else setIsInValidPhone(false);
-  };
-
-  const checkValidPhoneDebounced = debounce(checkValidPhone, 700);
-
-  const handleSearchPhoneChange = (e) => {
-    let phone = e.target.value;
-    setSearchPhone(phone);
-    checkValidPhoneDebounced(phone);
-  };
-
   const getDepartureDateTime = (ticket) => {
     let bookingDate = getFormattedBookingDate(ticket.bookingDateTime);
     return ticket.trip.departureTime.concat(" ", bookingDate);
   };
 
-  const filterTickets = (ticketList) => {
+  const sortTickets = (ticketList) => {
     if (ticketList?.length === 0) return ticketList;
-
-    let finalTickets = ticketList;
-    // filter
-    finalTickets = ticketList.filter((ticket) => {
-      const departureDateTime = getDepartureDateTime(ticket);
-      return isAfter(
-        parse(departureDateTime, "HH:mm dd/MM/yyyy", new Date()),
-        new Date()
-      );
-    });
 
     const compareByDepartureDateTimeAsc = (a, b) => {
       const aDateTime = parse(
@@ -118,9 +91,9 @@ const BookingSearch = () => {
     };
 
     // sort desc
-    finalTickets.sort(compareByDepartureDateTimeAsc);
+    ticketList.sort(compareByDepartureDateTimeAsc);
 
-    return finalTickets;
+    return ticketList;
   };
 
   const getPaymentStatusObject = (paymentStatus) => {
@@ -148,43 +121,23 @@ const BookingSearch = () => {
 
   // filter and sort booking date desc
   useEffect(() => {
-    const newTickets = filterTickets(bookingSearchQuery?.data ?? []);
-    setFilteredTickets(newTickets);
-  }, [bookingSearchQuery.data, searchPhone]);
+    const newTickets = sortTickets(bookingSearchQuery?.data ?? []);
+    setSortedTickets(newTickets);
+  }, [bookingSearchQuery.data]);
 
   return (
-    <Box mt="100px" display="flex" flexDirection="column" gap="20px">
-      <Box
-        bgcolor={colors.primary[100]}
-        display="flex"
-        justifyContent="center"
-        borderRadius="6px"
-        p="30px 200px"
-        gap="30px"
-      >
-        <TextField
-          fullWidth
-          value={searchPhone}
-          onChange={handleSearchPhoneChange}
-          id="phone"
-          label="Số điện thoại"
-          variant="standard"
-          error={isInValidPhone}
-          helperText={isInValidPhone && messages.phone.invalid}
-          InputProps={{
-            style: {
-              fontSize: "1.5rem",
-            },
-          }}
-          InputLabelProps={{
-            style: {
-              fontSize: "1.2rem",
-            },
-          }}
-        />
-      </Box>
-      {bookingSearchQuery?.data && !isInValidPhone ? (
-        filteredTickets.length !== 0 && !isInValidPhone ? (
+    <Box
+      mt="100px"
+      display="flex"
+      flexDirection="column"
+      gap="20px"
+      alignItems="center"
+    >
+      <Typography variant="h2" fontWeight="bold">
+        Vé của bạn
+      </Typography>
+      {bookingSearchQuery?.data ? (
+        sortedTickets.length !== 0 ? (
           <Box
             display="grid"
             gridTemplateColumns="repeat(12, 1fr)"
@@ -197,7 +150,7 @@ const BookingSearch = () => {
               maxHeight: 400,
             }}
           >
-            {filteredTickets.map((booking) => {
+            {sortedTickets.map((booking) => {
               const { trip, bookingDateTime, seatNumber, paymentStatus } =
                 booking;
               return (
@@ -263,6 +216,7 @@ const BookingSearch = () => {
             })}
           </Box>
         ) : (
+          // no result
           <Box
             p="100px"
             display="flex"
@@ -289,6 +243,7 @@ const BookingSearch = () => {
         )
       ) : undefined}
 
+      {/* Ticket detail modal */}
       <Modal
         sx={{
           "& .MuiBox-root": {
@@ -561,4 +516,4 @@ const BookingSearch = () => {
   );
 };
 
-export default BookingSearch;
+export default MyTicket;
