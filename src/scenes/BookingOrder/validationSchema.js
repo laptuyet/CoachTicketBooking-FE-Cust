@@ -8,7 +8,9 @@ export default [
         trip: yup.object().required(msg.autocomplete.required),
         source: yup.object().required(msg.autocomplete.required),
         destination: yup.object().required(msg.autocomplete.required),
-        bookingDateTime: yup.date().required(msg.common.required),
+        from: yup.date().required(msg.autocomplete.required),
+        to: yup.date().required(msg.autocomplete.required),
+        bookingDateTime: yup.date().notRequired(),
         bookingType: yup.string().notRequired()
     }),
     yup.object().shape({

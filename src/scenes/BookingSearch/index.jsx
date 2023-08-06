@@ -18,13 +18,6 @@ import { tokens } from "../../theme";
 import { APP_CONSTANTS } from "../../utils/appContants";
 import { messages } from "../../utils/validationMessages";
 
-const getFormattedBookingDate = (bookingDateTime) => {
-  return format(
-    parse(bookingDateTime, "yyyy-MM-dd HH:mm", new Date()),
-    "dd/MM/yyyy"
-  );
-};
-
 const getFormattedPaymentDateTime = (paymentDateTime) => {
   return format(
     parse(paymentDateTime, "yyyy-MM-dd HH:mm:ss", new Date()),
@@ -85,35 +78,21 @@ const BookingSearch = () => {
     checkValidPhoneDebounced(phone);
   };
 
-  const getDepartureDateTime = (ticket) => {
-    let bookingDate = getFormattedBookingDate(ticket.bookingDateTime);
-    return ticket.trip.departureTime.concat(" ", bookingDate);
-  };
-
   const filterTickets = (ticketList) => {
     if (ticketList?.length === 0) return ticketList;
 
     let finalTickets = ticketList;
     // filter
     finalTickets = ticketList.filter((ticket) => {
-      const departureDateTime = getDepartureDateTime(ticket);
       return isAfter(
-        parse(departureDateTime, "HH:mm dd/MM/yyyy", new Date()),
+        parse(ticket.trip.departureDateTime, "yyyy-MM-dd HH:mm", new Date()),
         new Date()
       );
     });
 
     const compareByDepartureDateTimeAsc = (a, b) => {
-      const aDateTime = parse(
-        getDepartureDateTime(a),
-        "HH:mm dd-MM-yyyy",
-        new Date()
-      );
-      const bDateTime = parse(
-        getDepartureDateTime(b),
-        "HH:mm dd-MM-yyyy",
-        new Date()
-      );
+      const aDateTime = a.trip.departureDateTime;
+      const bDateTime = b.trip.departureDateTime;
       return compareAsc(bDateTime, aDateTime);
     };
 
@@ -242,8 +221,14 @@ const BookingSearch = () => {
                         </Typography>
                         <Typography variant="h6">
                           <span style={{ fontWeight: "bold" }}>Ngày đi: </span>{" "}
-                          {trip.departureTime}{" "}
-                          {getFormattedBookingDate(bookingDateTime)}
+                          {format(
+                            parse(
+                              trip.departureDateTime,
+                              "yyyy-MM-dd HH:mm",
+                              new Date()
+                            ),
+                            "HH:mm dd-MM-yyyy"
+                          )}
                         </Typography>
                         <Typography variant="h6">
                           <span style={{ fontWeight: "bold" }}>Ghế: </span>
@@ -337,9 +322,13 @@ const BookingSearch = () => {
                   </Typography>
                   <Typography variant="h6">
                     <span style={{ fontWeight: "bold" }}>Ngày đi: </span>{" "}
-                    {bookingDetailQuery.data.trip.departureTime}{" "}
-                    {getFormattedBookingDate(
-                      bookingDetailQuery.data.bookingDateTime
+                    {format(
+                      parse(
+                        bookingDetailQuery.data.trip.departureDateTime,
+                        "yyyy-MM-dd HH:mm",
+                        new Date()
+                      ),
+                      "HH:mm dd-MM-yyyy"
                     )}
                   </Typography>
                   <Typography variant="h6">

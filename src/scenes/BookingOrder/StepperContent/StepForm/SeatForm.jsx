@@ -52,7 +52,10 @@ const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           color={colors.greyAccent[700]}
         >{`\u25CF`}</Typography>
         <Typography component="span" variant="h5">
-          {`${trip.departureTime} ${bookingDate}`}
+          {format(
+            parse(trip.departureDateTime, "yyyy-MM-dd HH:mm", new Date()),
+            "HH:mm dd-MM-yyyy"
+          )}
         </Typography>
         <Typography
           component="span"

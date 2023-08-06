@@ -18,13 +18,6 @@ import { tokens } from "../../theme";
 import { APP_CONSTANTS } from "../../utils/appContants";
 import { messages } from "../../utils/validationMessages";
 
-const getFormattedBookingDate = (bookingDateTime) => {
-  return format(
-    parse(bookingDateTime, "yyyy-MM-dd HH:mm", new Date()),
-    "dd/MM/yyyy"
-  );
-};
-
 const getFormattedPaymentDateTime = (paymentDateTime) => {
   return format(
     parse(paymentDateTime, "yyyy-MM-dd HH:mm:ss", new Date()),
@@ -68,25 +61,12 @@ const MyTicket = () => {
     enabled: selectedTicket >= 0,
   });
 
-  const getDepartureDateTime = (ticket) => {
-    let bookingDate = getFormattedBookingDate(ticket.bookingDateTime);
-    return ticket.trip.departureTime.concat(" ", bookingDate);
-  };
-
   const sortTickets = (ticketList) => {
     if (ticketList?.length === 0) return ticketList;
 
     const compareByDepartureDateTimeAsc = (a, b) => {
-      const aDateTime = parse(
-        getDepartureDateTime(a),
-        "HH:mm dd-MM-yyyy",
-        new Date()
-      );
-      const bDateTime = parse(
-        getDepartureDateTime(b),
-        "HH:mm dd-MM-yyyy",
-        new Date()
-      );
+      const aDateTime = a.trip.departureDateTime;
+      const bDateTime = b.trip.departureDateTime;
       return compareAsc(bDateTime, aDateTime);
     };
 
@@ -195,8 +175,14 @@ const MyTicket = () => {
                         </Typography>
                         <Typography variant="h6">
                           <span style={{ fontWeight: "bold" }}>Ngày đi: </span>{" "}
-                          {trip.departureTime}{" "}
-                          {getFormattedBookingDate(bookingDateTime)}
+                          {format(
+                            parse(
+                              trip.departureDateTime,
+                              "yyyy-MM-dd HH:mm",
+                              new Date()
+                            ),
+                            "HH:mm dd-MM-yyyy"
+                          )}
                         </Typography>
                         <Typography variant="h6">
                           <span style={{ fontWeight: "bold" }}>Ghế: </span>
@@ -291,10 +277,14 @@ const MyTicket = () => {
                     {`${bookingDetailQuery.data.trip.coach.name} ${bookingDetailQuery.data.trip.coach.coachType}`}
                   </Typography>
                   <Typography variant="h6">
-                    <span style={{ fontWeight: "bold" }}>Ngày đi: </span>{" "}
-                    {bookingDetailQuery.data.trip.departureTime}{" "}
-                    {getFormattedBookingDate(
-                      bookingDetailQuery.data.bookingDateTime
+                    <span style={{ fontWeight: "bold" }}>Ngày giờ đi: </span>{" "}
+                    {format(
+                      parse(
+                        bookingDetailQuery.data.trip.departureDateTime,
+                        "yyyy-MM-dd HH:mm",
+                        new Date()
+                      ),
+                      "HH:mm dd-MM-yyyy"
                     )}
                   </Typography>
                   <Typography variant="h6">

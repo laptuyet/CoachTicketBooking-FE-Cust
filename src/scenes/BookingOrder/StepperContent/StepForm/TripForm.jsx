@@ -81,8 +81,6 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const [priceFilter, setPriceFilter] = useState([MIN_PRICE, MAX_PRICE]);
   const prevTimeBox = useRef(selectedDepartureTimeBox); // keep old timebox to perform uncheck timebox filter
 
-  const setTripListDebounced = debounce(setTripList, 300);
-
   const formik = useFormikContext();
   const queryClient = useQueryClient();
   const { values, errors, touched, setFieldValue, handleChange, handleBlur } =
@@ -101,13 +99,15 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
       "trips",
       selectedSource?.id,
       selectedDestination?.id,
-      values.bookingDateTime.split(" ")[0],
+      values.from.split(" ")[0],
+      values.to.split(" ")[0],
     ],
     queryFn: () =>
       tripApi.findAllTripBySourceAndDest(
         selectedSource?.id,
         selectedDestination?.id,
-        values.bookingDateTime.split(" ")[0]
+        values.from.split(" ")[0],
+        values.to.split(" ")[0]
       ),
     keepPreviousData: true,
     enabled: !!selectedSource && !!selectedDestination && findClicked,
@@ -190,7 +190,11 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
       );
       const end = parse(selectedDepartureTimeBox.endTime, "HH:mm", new Date());
       filteredTrips = originalTrips.filter((trip) => {
-        const checkTime = parse(trip?.departureTime, "HH:mm", new Date());
+        const checkTime = parse(
+          trip?.departureDateTime.split(" ")[1],
+          "HH:mm",
+          new Date()
+        );
         return isWithinInterval(checkTime, { start: start, end: end });
       });
     } else filteredTrips = originalTrips;
@@ -207,8 +211,8 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     return filteredTrips;
   };
 
-  const getNumberOfOrderedSeats = async (tripId, bookingDateTime) => {
-    const resp = await bookingApi.getSeatBooking(tripId, bookingDateTime);
+  const getNumberOfOrderedSeats = async (tripId) => {
+    const resp = await bookingApi.getSeatBooking(tripId);
     return resp;
   };
 
@@ -217,7 +221,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     const fetchOrderedSeats = async () => {
       if (findTripQuery.data && values.bookingDateTime) {
         const promises = findTripQuery.data.map((trip) =>
-          getNumberOfOrderedSeats(trip.id, values.bookingDateTime)
+          getNumberOfOrderedSeats(trip.id)
         );
 
         const orderedSeatsList = await Promise.all(promises);
@@ -308,7 +312,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           display="flex"
           alignItems="center"
           sx={{
-            gridColumn: "span 8",
+            gridColumn: "span 6",
           }}
         >
           <Autocomplete
@@ -407,29 +411,21 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          gap="5px"
+          gap="10px"
           sx={{
-            gridColumn: "span 4",
+            gridColumn: "span 6",
           }}
         >
-          {/* departure time */}
-
+          {/* from date */}
           <FormControl fullWidth>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 format="dd/MM/yyyy"
-                label="Ngày khởi hành"
+                label="From"
                 minDate={new Date()}
-                value={parse(
-                  values.bookingDateTime,
-                  "yyyy-MM-dd HH:mm",
-                  new Date()
-                )}
+                value={parse(values.from, "yyyy-MM-dd", new Date())}
                 onChange={(newDate) => {
-                  setFieldValue(
-                    "bookingDateTime",
-                    format(newDate, "yyyy-MM-dd HH:mm")
-                  );
+                  setFieldValue("from", format(newDate, "yyyy-MM-dd"));
                 }}
                 slotProps={{
                   textField: {
@@ -442,19 +438,56 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                     },
                     size: "small",
                     color: "warning",
-                    error: !!touched.dob && !!errors.dob,
+                    error: !!touched.from && !!errors.from,
                   },
-                  // dialog: {
-                  //   sx: {
-                  //     "& .MuiButton-root": {
-                  //       color: colors.grey[100],
-                  //     },
-                  //   },
-                  // },
+                  dialog: {
+                    sx: {
+                      "& .MuiButton-root": {
+                        color: colors.greyAccent[100],
+                      },
+                    },
+                  },
                 }}
               />
             </LocalizationProvider>
           </FormControl>
+
+          {/* to date */}
+          <FormControl fullWidth>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
+                format="dd/MM/yyyy"
+                label="To"
+                minDate={parse(values.from, "yyyy-MM-dd", new Date())}
+                value={parse(values.to, "yyyy-MM-dd", new Date())}
+                onChange={(newDate) => {
+                  setFieldValue("to", format(newDate, "yyyy-MM-dd"));
+                }}
+                slotProps={{
+                  textField: {
+                    InputProps: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <CalendarMonthIcon />
+                        </InputAdornment>
+                      ),
+                    },
+                    size: "small",
+                    color: "warning",
+                    error: !!touched.to && !!errors.to,
+                  },
+                  dialog: {
+                    sx: {
+                      "& .MuiButton-root": {
+                        color: colors.greyAccent[100],
+                      },
+                    },
+                  },
+                }}
+              />
+            </LocalizationProvider>
+          </FormControl>
+
           <LoadingButton
             disableRipple
             disableTouchRipple
@@ -716,17 +749,31 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                   >
                     <Box display="flex" flexDirection="column">
                       <CardContent sx={{ flex: "1 0 auto" }}>
-                        <Typography variant="h4">
-                          {`${trip.departureTime} \u21C0 ${
-                            trip?.arrivalTime ?? "Chưa xác định"
-                          }`}
+                        <Typography variant="h5" fontStyle="italic">
+                          Ngày giờ đi
+                        </Typography>
+                        <Typography variant="h4" mt="5px" fontWeight="bold">
+                          {format(
+                            parse(
+                              trip.departureDateTime,
+                              "yyyy-MM-dd HH:mm",
+                              new Date()
+                            ),
+                            "HH:mm dd-MM-yyyy"
+                          )}
+                        </Typography>
+                        <Typography mt="5px" variant="h6">
+                          Thời lượng di chuyển:{" "}
+                          {trip.duration
+                            ? trip.duration + " tiếng"
+                            : "Chưa xác định"}
                         </Typography>
                         <Box
                           display="flex"
                           alignItems="center"
                           justifyContent="space-between"
                           gap="6px"
-                          mt="30px"
+                          mt="20px"
                           p="6px 10px"
                           borderRadius="30px"
                           bgcolor={colors.greyAccent[300]}

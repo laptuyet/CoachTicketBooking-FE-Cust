@@ -55,11 +55,6 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     enabled: isLoggedIn && loggedInUsername !== null,
   });
 
-  const bookingDate = format(
-    parse(bookingDateTime, "yyyy-MM-dd HH:mm", new Date()),
-    "dd/MM/yyyy"
-  );
-
   useEffect(() => {
     if (userInfoQuery?.data) {
       const { firstName, lastName, email, phone, address } = userInfoQuery.data;
@@ -109,8 +104,11 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             {trip.coach.coachType}
           </Typography>
           <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>Ngày đi: </span>{" "}
-            {trip.departureTime} {bookingDate}
+            <span style={{ fontWeight: "bold" }}>Ngày giờ đi: </span>{" "}
+            {format(
+              parse(trip.departureDateTime, "yyyy-MM-dd HH:mm", new Date()),
+              "HH:mm dd-MM-yyyy"
+            )}
           </Typography>
           <Typography component="span" variant="h6">
             <span style={{ fontWeight: "bold" }}>Tổng tiền: </span>
