@@ -14,7 +14,7 @@ export default [
         bookingType: yup.string().notRequired()
     }),
     yup.object().shape({
-        seatNumber: yup.array().required(msg.autocomplete.required).min(1, "Chọn ít nhất 1 chỗ"),
+        seatNumber: yup.array().required(msg.autocomplete.required).min(1, msg.seat.minSeatChoose),
     }),
     yup.object().shape({
         pickUpAddress: yup.string().required(msg.common.required),
@@ -31,7 +31,7 @@ export default [
         totalPayment: yup.number().notRequired(),
         paymentDateTime: yup.date().notRequired(),
         paymentMethod: yup.string().required(msg.autocomplete.required),
-        paymentStatus: yup.string().notRequired(),
+        bookingStatus: yup.string().notRequired(),
         nameOnCard: yup.string().when('paymentMethod', {
             is: 'CARD',
             then: () =>

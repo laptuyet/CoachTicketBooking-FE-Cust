@@ -26,16 +26,17 @@ const initialValues = {
   to: format(new Date(), "yyyy-MM-dd"), // remove when submit
   bookingDateTime: format(new Date(), "yyyy-MM-dd HH:mm"),
   seatNumber: [], // user can choose max 5 seat, in that case: create 5 tickets
-  bookingType: "ONEWAY",
+  // bookingType: "ONEWAY",
   pickUpAddress: "",
   firstName: "", // used for create user
   lastName: "", // used for create user
   phone: "", // used for create user
   email: "", // used for create user
   totalPayment: 0,
-  paymentDateTime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+  // paymentDateTime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+  paymentDateTime: null, // set current Datetime when cust booked with card select.
   paymentMethod: "CASH",
-  paymentStatus: "UNPAID",
+  bookingStatus: "UNPAID",
   nameOnCard: "", // used to validate when paymentMethod is CARD, remove when submit
   cardNumber: "", // used to validate when paymentMethod is CARD, remove when submit
   expiredDate: format(new Date(), "MM/yy"), // used to validate when paymentMethod is CARD, remove when submit
@@ -117,7 +118,13 @@ const StepperBooking = () => {
       ...newValues
     } = values;
 
+    if (newValues.paymentMethod === "CARD") {
+      newValues.paymentDateTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+    }
+
     actions.setSubmitting(false);
+
+    // console.log(newValues);
 
     createMutation.mutate(newValues, {
       onSuccess: () => {

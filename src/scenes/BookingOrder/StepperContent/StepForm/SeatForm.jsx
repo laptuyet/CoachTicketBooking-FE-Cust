@@ -42,9 +42,7 @@ const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         gap="15px"
       >
         <Typography component="span" variant="h5">
-          {`${trip.source.name} ${
-            bookingData.bookingType === "ONEWAY" ? `\u21D2` : `\u21CB`
-          } ${trip.destination.name}`}
+          {`${trip.source.name} ${`\u21D2`} ${trip.destination.name}`}
         </Typography>
         <Typography
           component="span"

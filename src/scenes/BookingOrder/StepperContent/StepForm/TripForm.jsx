@@ -421,7 +421,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 format="dd/MM/yyyy"
-                label="From"
+                label="Từ ngày"
                 minDate={new Date()}
                 value={parse(values.from, "yyyy-MM-dd", new Date())}
                 onChange={(newDate) => {
@@ -457,7 +457,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 format="dd/MM/yyyy"
-                label="To"
+                label="Đến ngày"
                 minDate={parse(values.from, "yyyy-MM-dd", new Date())}
                 value={parse(values.to, "yyyy-MM-dd", new Date())}
                 onChange={(newDate) => {

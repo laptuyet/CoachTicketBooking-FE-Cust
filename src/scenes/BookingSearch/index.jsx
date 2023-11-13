@@ -44,15 +44,17 @@ const BookingSearch = () => {
   const colors = tokens();
   const [openModal, setOpenModal] = useState(false);
   const [searchPhone, setSearchPhone] = useState("");
+  const [searchCode, setSearchCode] = useState("");
   const [isInValidPhone, setIsInValidPhone] = useState(false);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(-1);
   const queryClient = useQueryClient();
 
   const bookingSearchQuery = useQuery({
-    queryKey: ["bookings", "all", searchPhone],
-    queryFn: () => bookingApi.getAllByPhone(searchPhone),
-    enabled: !isInValidPhone && searchPhone !== "",
+    queryKey: ["bookings", "code", searchCode],
+    queryFn: () => bookingApi.getByCode(searchCode),
+    // enabled: !isInValidPhone && searchPhone !== "",
+    enabled: searchCode !== "",
   });
 
   const bookingDetailQuery = useQuery({
@@ -76,6 +78,11 @@ const BookingSearch = () => {
     let phone = e.target.value;
     setSearchPhone(phone);
     checkValidPhoneDebounced(phone);
+  };
+
+  const handleSearchCodeChange = (e) => {
+    let code = e.target.value;
+    setSearchCode(code);
   };
 
   const filterTickets = (ticketList) => {
@@ -110,6 +117,8 @@ const BookingSearch = () => {
         return { title: "Đã thanh toán", color: "success" };
       case "CANCEL":
         return { title: "Đã hủy vé", color: "info" };
+      case "CHANGED":
+        return { title: "Đã đổi vé", color: "error" };
     }
   };
 
@@ -122,14 +131,19 @@ const BookingSearch = () => {
         return "Đã thanh toán";
       case "CANCEL":
         return "Đã hủy vé";
+      case "CHANGED":
+        return "Đã đổi vé";
     }
   };
 
-  // filter and sort booking date desc
-  useEffect(() => {
-    const newTickets = filterTickets(bookingSearchQuery?.data ?? []);
-    setFilteredTickets(newTickets);
-  }, [bookingSearchQuery.data, searchPhone]);
+  // // filter and sort booking date desc
+  // useEffect(() => {
+  //   // let resTicket = bookingSearchQuery?.data;
+  //   // console.log(resTicket);
+  //   // const newTickets = filterTickets([resTicket] ?? []);
+  //   // console.log(newTickets);
+  //   setFilteredTickets([bookingSearchQuery?.data ?? []]);
+  // }, [bookingSearchQuery?.data, searchCode]);
 
   return (
     <Box mt="100px" display="flex" flexDirection="column" gap="20px">
@@ -143,13 +157,14 @@ const BookingSearch = () => {
       >
         <TextField
           fullWidth
-          value={searchPhone}
-          onChange={handleSearchPhoneChange}
-          id="phone"
-          label="Số điện thoại"
+          value={searchCode}
+          onChange={handleSearchCodeChange}
+          id="code"
+          // label="Số điện thoại"
+          label="Mã vé"
           variant="standard"
-          error={isInValidPhone}
-          helperText={isInValidPhone && messages.phone.invalid}
+          // error={isInValidPhone}
+          // helperText={isInValidPhone && messages.phone.invalid}
           InputProps={{
             style: {
               fontSize: "1.5rem",
@@ -162,117 +177,113 @@ const BookingSearch = () => {
           }}
         />
       </Box>
-      {bookingSearchQuery?.data && !isInValidPhone ? (
-        filteredTickets.length !== 0 && !isInValidPhone ? (
-          <Box
-            display="grid"
-            gridTemplateColumns="repeat(12, 1fr)"
-            gap="30px"
-            p="50px"
+      {bookingSearchQuery?.data ? (
+        <Box
+          display="grid"
+          gridTemplateColumns="repeat(12, 1fr)"
+          gap="30px"
+          p="50px"
+          sx={{
+            width: "100%",
+            position: "relative",
+            overflow: "auto",
+            maxHeight: 400,
+          }}
+        >
+          <Card
+            key={bookingSearchQuery?.data.id}
+            onClick={() => {
+              setSelectedTicket(bookingSearchQuery?.data.id);
+              setOpenModal(!openModal);
+            }}
+            elevation={0}
             sx={{
-              width: "100%",
-              position: "relative",
-              overflow: "auto",
-              maxHeight: 400,
+              display: "flex",
+              alignItems: "center",
+              gridColumn: "span 6",
+              cursor: "pointer",
+              padding: "0 20px",
             }}
           >
-            {filteredTickets.map((booking) => {
-              const { trip, bookingDateTime, seatNumber, paymentStatus } =
-                booking;
-              return (
-                <Card
-                  key={booking.id}
-                  onClick={() => {
-                    setSelectedTicket(booking.id);
-                    setOpenModal(!openModal);
-                  }}
-                  elevation={0}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gridColumn: "span 6",
-                    cursor: "pointer",
-                    padding: "0 20px",
-                  }}
-                >
-                  <Box
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                  >
-                    <CardContent
-                      sx={{
-                        display: "flex",
-                        gap: "20px",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Box>
-                        <Typography component="span" variant="h6">
-                          <span style={{ fontWeight: "bold" }}>Tuyến: </span>
-                          {`${trip.source.name}
-                           ${`\u21D2`}
-                         ${trip.destination.name}`}
-                        </Typography>
-                        <Typography variant="h6">
-                          {" "}
-                          <span style={{ fontWeight: "bold" }}>Xe: </span>
-                          {trip.coach.coachType}
-                        </Typography>
-                        <Typography variant="h6">
-                          <span style={{ fontWeight: "bold" }}>Ngày đi: </span>{" "}
-                          {format(
-                            parse(
-                              trip.departureDateTime,
-                              "yyyy-MM-dd HH:mm",
-                              new Date()
-                            ),
-                            "HH:mm dd-MM-yyyy"
-                          )}
-                        </Typography>
-                        <Typography variant="h6">
-                          <span style={{ fontWeight: "bold" }}>Ghế: </span>
-                          {seatNumber}
-                        </Typography>
-                      </Box>
-                      <Box display="flex" justifyContent="end" alignItems="end">
-                        <Chip
-                          label={getPaymentStatusObject(paymentStatus)?.title}
-                          color={getPaymentStatusObject(paymentStatus)?.color}
-                        />
-                      </Box>
-                    </CardContent>
-                  </Box>
-                </Card>
-              );
-            })}
-          </Box>
-        ) : (
-          <Box
-            p="100px"
-            display="flex"
-            flexDirection="column"
-            gap="10px"
-            justifyContent="center"
-            alignItems="center"
+            <Box display="flex" flexDirection="column" alignItems="center">
+              <CardContent
+                sx={{
+                  display: "flex",
+                  gap: "20px",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box>
+                  <Typography component="span" variant="h6">
+                    <span style={{ fontWeight: "bold" }}>Tuyến: </span>
+                    {`${bookingSearchQuery?.data.trip.source.name}
+                       ${`\u21D2`}
+                     ${bookingSearchQuery?.data.trip.destination.name}`}
+                  </Typography>
+                  <Typography variant="h6">
+                    {" "}
+                    <span style={{ fontWeight: "bold" }}>Xe: </span>
+                    {bookingSearchQuery?.data.trip.coach.coachType}
+                  </Typography>
+                  <Typography variant="h6">
+                    <span style={{ fontWeight: "bold" }}>Ngày đi: </span>{" "}
+                    {format(
+                      parse(
+                        bookingSearchQuery?.data.trip.departureDateTime,
+                        "yyyy-MM-dd HH:mm",
+                        new Date()
+                      ),
+                      "HH:mm dd-MM-yyyy"
+                    )}
+                  </Typography>
+                  <Typography variant="h6">
+                    <span style={{ fontWeight: "bold" }}>Ghế: </span>
+                    {bookingSearchQuery?.data.seatNumber}
+                  </Typography>
+                </Box>
+                <Box display="flex" justifyContent="end" alignItems="end">
+                  <Chip
+                    label={
+                      getPaymentStatusObject(
+                        bookingSearchQuery?.data.bookingStatus
+                      )?.title
+                    }
+                    color={
+                      getPaymentStatusObject(
+                        bookingSearchQuery?.data.bookingStatus
+                      )?.color
+                    }
+                  />
+                </Box>
+              </CardContent>
+            </Box>
+          </Card>
+        </Box>
+      ) : (
+        <Box
+          p="100px"
+          display="flex"
+          flexDirection="column"
+          gap="10px"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <ContentPasteSearchOutlinedIcon
+            sx={{
+              width: "150px",
+              height: "150px",
+              color: colors.greyAccent[500],
+            }}
+          />
+          <Typography
+            color={colors.greyAccent[500]}
+            variant="h2"
+            fontWeight="bold"
           >
-            <ContentPasteSearchOutlinedIcon
-              sx={{
-                width: "150px",
-                height: "150px",
-                color: colors.greyAccent[500],
-              }}
-            />
-            <Typography
-              color={colors.greyAccent[500]}
-              variant="h2"
-              fontWeight="bold"
-            >
-              Không có kết quả
-            </Typography>
-          </Box>
-        )
-      ) : undefined}
+            Không có kết quả
+          </Typography>
+        </Box>
+      )}
 
       <Modal
         sx={{
@@ -518,7 +529,7 @@ const BookingSearch = () => {
           <Box>
             {bookingDetailQuery?.data && (
               <Box maxHeight="150px" overflow="auto">
-                {bookingDetailQuery.data.paymentHistories
+                {bookingDetailQuery.data.bookingStatusHistories
                   .toReversed()
                   .map((history, index) => {
                     const { oldStatus, newStatus, statusChangeDateTime } =

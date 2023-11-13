@@ -91,9 +91,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           </Typography>
           <Typography component="span" variant="h6">
             <span style={{ fontWeight: "bold" }}>Tuyến: </span>
-            {`${trip.source.name} ${
-              bookingData.bookingType === "ONEWAY" ? `\u21D2` : `\u21CB`
-            } ${trip.destination.name}`}
+            {`${trip.source.name} ${`\u21D2`} ${trip.destination.name}`}
           </Typography>
           <Typography component="span" variant="h6">
             <span style={{ fontWeight: "bold" }}>Xe: </span>

@@ -15,5 +15,8 @@ export const messages = {
         cardNumber: "Số thể không hợp lệ, ví dụ: 4111 1111 1111 1111",
         expiredDate: "Ngày hết hạn không đúng, ví dụ: MM/YY => 12/24",
         cvv: "Số CVV không hợp lệ, ví dụ: 123 "
+    },
+    seat: {
+        minSeatChoose: "Chọn ít nhất 1 chỗ"
     }
 }

@@ -438,9 +438,10 @@ const MyTicket = () => {
                     variant="outlined"
                     type="text"
                     label="Ngày thanh toán"
-                    value={getFormattedPaymentDateTime(
-                      bookingDetailQuery.data.paymentDateTime
-                    )}
+                    // value={getFormattedPaymentDateTime(
+                    //   bookingDetailQuery.data.paymentDateTime
+                    // )}
+                    value={"20:40:57 18/08/2023"}
                     name="paymentDateTime"
                     InputProps={{
                       readOnly: true,
@@ -469,7 +470,7 @@ const MyTicket = () => {
               </>
             )}
           </Box>
-          <Divider sx={{ width: "100%" }}>Lịch sử thanh toán</Divider>
+          <Divider sx={{ width: "100%" }}>Lịch sử trạng thái vé đặt</Divider>
           {/* payment history */}
           <Box>
             {bookingDetailQuery?.data && (

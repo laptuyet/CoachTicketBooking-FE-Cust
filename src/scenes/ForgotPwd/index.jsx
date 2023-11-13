@@ -17,7 +17,7 @@ const initialValues = {
 
 const checkExistEmailDebounced = debounce(authApi.checkExistEmail, 500);
 
-const forotSchema = yup.object().shape({
+const forgotSchema = yup.object().shape({
   email: yup
     .string()
     .required(messages.common.required)
@@ -63,7 +63,7 @@ const ForgotPwd = () => {
       <Formik
         onSubmit={handleForgotSubmit}
         initialValues={initialValues}
-        validationSchema={forotSchema}
+        validationSchema={forgotSchema}
         enableReinitialize={true}
       >
         {({
